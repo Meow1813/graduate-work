@@ -1,0 +1,73 @@
+GET http://localhost:8080/ads/1/comments
+Content-Type: application/json
+Authorization: Basic user@gmail.com password
+
+###
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "user@gmail.com",
+  "password": "password"
+}
+
+###
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+  "username": "user@gmail.com",
+  "password": "password",
+  "firstName": " asdad",
+  "lastName": " asdad",
+  "phone": " asdad",
+  "role": "USER"
+}
+
+###
+GET http://localhost:8080/ads/me
+Content-Type: application/json
+Authorization: Basic user@gmail.com password
+
+###
+GET http://localhost:8080/users/me
+Content-Type: application/json
+Authorization: Basic user@gmail.com password
+
+###
+PATCH http://localhost:8080/users/me
+Content-Type: application/json
+Authorization: Basic user@gmail.com password
+
+{
+  "phone": "33333",
+  "lastName": "Ivanov",
+  "firstName": "Ivan"
+}
+
+###
+GET http://localhost:8080/ads
+Content-Type: application/json
+Authorization: Basic user@gmail.com password
+
+###
+POST http://localhost:8080/users/set_password
+Content-Type: application/json
+Authorization: Basic user@gmail.com password
+
+{
+  "newPassword": "password",
+  "currentPassword": "password1"
+}
+
+###
+POST http://localhost:8080/ads
+Content-Type: application/json
+Authorization: Basic user@gmail.com password
+
+{
+  "price": 123,
+  "description": "123",
+  "title": "123"
+}
+

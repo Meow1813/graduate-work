@@ -40,13 +40,13 @@ public class CommentController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = Comment.class))}),
+                    @Schema(implementation = CommentDto.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content()),
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content())
 
     })
-    public ResponseEntity<Comment> addComment(@PathVariable("id") Integer id, @RequestBody CreateOrUpdateComment Text) {
-        return ResponseEntity.ok(new Comment());
+    public ResponseEntity<CommentDto> addComment(@PathVariable("id") Integer id, @RequestBody CreateOrUpdateComment Text) {
+        return ResponseEntity.ok(new CommentDto());
     }
 
     @DeleteMapping("/{adId}/comments/{commentId}")
@@ -67,15 +67,15 @@ public class CommentController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = Comment.class))}),
+                    @Schema(implementation = CommentDto.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PatchMapping("/{id}/comments/{commentId}")
-    public ResponseEntity<Ad> updateComment(@PathVariable("id") Integer id,
-                                      @PathVariable("commentId") Integer commentId) {
-        return ResponseEntity.ok(new Ad());
+    public ResponseEntity<AdDto> updateComment(@PathVariable("id") Integer id,
+                                               @PathVariable("commentId") Integer commentId) {
+        return ResponseEntity.ok(new AdDto());
     }
 
 }

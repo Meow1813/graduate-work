@@ -9,13 +9,13 @@ import java.math.BigDecimal;
  */
 @Data
 public class AdInfoDto {
-    private int pk;
+    private long pk;
     private String authorFirstName;
     private String authorLastName;
     private String description;
     private String email;
     private String image;
     private String phone;
-    private BigDecimal price;
+    private int price;
     private String title;
 }

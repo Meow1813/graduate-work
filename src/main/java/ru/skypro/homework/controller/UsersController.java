@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.PasswordDto;
 import ru.skypro.homework.dto.UserDto;
-import ru.skypro.homework.service.AvatarService;
+import ru.skypro.homework.service.UserService;
 
 @Slf4j
 @RestController
@@ -27,10 +27,10 @@ import ru.skypro.homework.service.AvatarService;
 public class UsersController {
     private static Logger logger = LoggerFactory.getLogger(UsersController.class);
 
-    private final AvatarService avatarService;
+    private final UserService userService;
 
     /**
-     * endpoint 1 - updating password fro existent user
+     * endpoint 1 - updating password from existent user
      * @param passwordDto
      */
     @Operation(summary = "Обновление пароля")
@@ -81,7 +81,7 @@ public class UsersController {
     public ResponseEntity<String> updateUserImage(@RequestParam MultipartFile image) {
         logger.info("Avatar Controller {}", image.getContentType());
         String username = "authenticatedUsername"; // Get from Authentication
-        String imageString = avatarService.uploadAvatar(username, image);
+        String imageString = userService.uploadAvatar(username, image);
         if (imageString == null) {
             logger.info("Unable to save avatar: {}", image.getName());
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);

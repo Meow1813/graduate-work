@@ -9,5 +9,5 @@ import java.util.Collection;
 public class Ads {
     @Schema(description = "общее количество объявлений")
     private Integer count;
-    private Collection<Ad> results;
+    private Collection<AdDto> results;
 }

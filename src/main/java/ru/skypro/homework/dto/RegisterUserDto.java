@@ -3,7 +3,7 @@ package ru.skypro.homework.dto;
 import lombok.Data;
 
 @Data
-public class Register {
+public class RegisterUserDto {
 
     private String username;
     private String password;

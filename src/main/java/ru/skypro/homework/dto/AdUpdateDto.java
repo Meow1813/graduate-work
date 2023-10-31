@@ -11,5 +11,5 @@ import java.math.BigDecimal;
 public class AdUpdateDto {
     private String title;
     private String description;
-    private BigDecimal price;
+    private int price;
 }

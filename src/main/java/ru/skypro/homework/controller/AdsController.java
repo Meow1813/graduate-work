@@ -34,19 +34,19 @@ public class AdsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema =
-                    @Schema(implementation = Ad.class))}),
+                    @Schema(implementation = AdDto.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addAd(@RequestPart(value = "properties") CreateOrUpdateAd createOrUpdateAd, @RequestPart(value = "image") MultipartFile image) {
         logger.info("Ads Controller image {}, createOrUpdateAd {}", image.getContentType(), createOrUpdateAd.getTitle());
-        Ad addedAd = adsService.addNewAd(createOrUpdateAd);
+        AdDto addedAd = adsService.addAd(createOrUpdateAd);
         if (addedAd == null) {
             logger.info("Unable to save the ad");
             return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
         logger.info("New ad is added: {}", addedAd.getTitle());
-        return new ResponseEntity<Ad>(addedAd, HttpStatus.CREATED);
+        return new ResponseEntity<AdDto>(addedAd, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Получение всех объявлений")
@@ -82,14 +82,14 @@ public class AdsController {
     @Operation(summary = "Обновление информации об объявлении")
     @ApiResponse(responseCode = "200", description = "OK", content = {
             @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = Ad.class))})
+            @Schema(implementation = AdDto.class))})
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "403", description = "Forbidden")
     @ApiResponse(responseCode = "404", description = "Not found")
     @PatchMapping("/{id}")
-    public ResponseEntity<Ad> patchAd(@PathVariable("id") Integer id,
-                                               @RequestBody AdUpdateDto adUpdateDto) {
-        return ResponseEntity.ok(new Ad());
+    public ResponseEntity<AdDto> patchAd(@PathVariable("id") Integer id,
+                                         @RequestBody AdUpdateDto adUpdateDto) {
+        return ResponseEntity.ok(new AdDto());
     }
 
     @Operation(summary = "Получение объявлений авторизованного пользователя")
@@ -112,7 +112,7 @@ public class AdsController {
     @ApiResponse(responseCode = "403", description = "Forbidden")
     @ApiResponse(responseCode = "404", description = "Not found")
     @PatchMapping("/{id}/image")
-    public ResponseEntity<Ad> updateImage(@PathVariable("id") Integer id, @RequestParam MultipartFile image) {
-        return ResponseEntity.ok(new Ad());
+    public ResponseEntity<AdDto> updateImage(@PathVariable("id") Integer id, @RequestParam MultipartFile image) {
+        return ResponseEntity.ok(new AdDto());
     }
 }

@@ -6,12 +6,12 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Comment {
+public class CommentDto {
     @Schema(description = "id  комментария")
     private Integer pk;
 
     @Schema(description = "id  автора комментария")
-    private Integer author;
+    private Long author;
 
     @Schema(description = "ссылка на  аватор автора(пользователя) комментария")
     private String authorImage;
@@ -24,6 +24,4 @@ public class Comment {
 
      @Schema(description = "Текст комментария")
     private String text;
-
-
 }

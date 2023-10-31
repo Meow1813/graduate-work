@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-public class Ad {
+public class AdDto {
     @Schema(description = "id автора объявления")
     private Integer author;
     @Schema(description = "ссылка на картинку объявления")

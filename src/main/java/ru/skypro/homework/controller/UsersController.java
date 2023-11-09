@@ -41,6 +41,7 @@ public class UsersController {
     })
     @PostMapping(value = "/set_password")
     public void updatePassword(@RequestBody PasswordDto passwordDto) {
+        userService.updatePassword(passwordDto);
     }
 
     /**
@@ -54,7 +55,8 @@ public class UsersController {
     })
     @GetMapping("/me")
     public ResponseEntity<UserDto> getUserInfo() {
-        return ResponseEntity.ok().build();
+        UserDto userDto = userService.getUserInfo();
+        return ResponseEntity.ok(userDto);
     }
 
     /**
@@ -68,7 +70,7 @@ public class UsersController {
     })
     @PatchMapping("/me")
     public ResponseEntity<UserDto> updateUserInfo(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(userService.updateUserInfo(userDto));
     }
 
     @Operation(summary = "Обновление аватара авторизованного пользователя")
@@ -81,7 +83,7 @@ public class UsersController {
     public ResponseEntity<String> updateUserImage(@RequestParam MultipartFile image) {
         logger.info("Avatar Controller {}", image.getContentType());
         String username = "authenticatedUsername"; // Get from Authentication
-        String imageString = userService.uploadAvatar(username, image);
+        String imageString = userService.updateUserImage(username, image);
         if (imageString == null) {
             logger.info("Unable to save avatar: {}", image.getName());
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);

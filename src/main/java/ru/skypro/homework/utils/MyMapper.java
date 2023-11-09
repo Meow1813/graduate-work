@@ -9,7 +9,8 @@ import ru.skypro.homework.entity.UserEntity;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class MyMapper {
@@ -43,7 +44,13 @@ public class MyMapper {
      * @return
      */
     public AdDto map(AdEntity entity) {
-        return modelMapper.map(entity, AdDto.class);
+        AdDto adDto = new AdDto();
+        adDto.setAuthor(entity.getAuthor().getId());
+        adDto.setImage(entity.getImage());
+        adDto.setPk(entity.getPk());
+        adDto.setPrice(entity.getPrice());
+        adDto.setTitle(entity.getTitle());
+        return adDto;
     }
 
     /**
@@ -74,7 +81,7 @@ public class MyMapper {
      * @param entity
      * @return
      */
-    private CommentDto map(CommentEntity entity){
+    public CommentDto map(CommentEntity entity){
         CommentDto dto = new CommentDto();
 
         dto.setPk(entity.getPk());
@@ -103,4 +110,44 @@ public class MyMapper {
     public UserEntity map(RegisterUserDto dto) {
         return modelMapper.map(dto, UserEntity.class);
     }
+
+    public UserEntity map(UserDto userDto) {
+        UserEntity userEntity = new UserEntity();
+
+        userEntity.setUsername(userDto.getEmail());
+        userEntity.setFirstName(userDto.getFirstName());
+        userEntity.setLastName(userDto.getLastName());
+        userEntity.setPhone(userDto.getPhone());
+        userEntity.setRole(userDto.getRole());
+        userEntity.setImage(userDto.getImage());
+
+        return userEntity;
+    }
+
+    public AdEntity map(CreateOrUpdateAd createOrUpdateAd, UserEntity author, String image){
+        AdEntity adEntity = new AdEntity();
+        adEntity.setAuthor(author);
+        adEntity.setImage(image);
+        adEntity.setTitle(createOrUpdateAd.getTitle());
+        adEntity.setDescription(createOrUpdateAd.getDescription());
+        adEntity.setPrice(createOrUpdateAd.getPrice());
+
+        return adEntity;
+    }
+    public CommentEntity map(CreateOrUpdateComment text, UserEntity user, AdEntity ad){
+        CommentEntity comment = new CommentEntity();
+        comment.setAd(ad);
+        comment.setText(text.getText());
+        comment.setAuthor(user);
+        return comment;
+    }
+
+    public Ads map(List<AdEntity> entities) {
+        List<AdDto> allAd = entities.stream().map(this::map).collect(Collectors.toList());
+        Ads ads = new Ads();
+        ads.setCount(allAd.size());
+        ads.setResults(allAd);
+        return ads;
+    }
+
 }

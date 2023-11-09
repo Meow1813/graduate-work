@@ -12,6 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.*;
+import ru.skypro.homework.exceptions.AdNotFoundException;
+import ru.skypro.homework.exceptions.CommentNotFoundException;
+import ru.skypro.homework.service.CommentService;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -20,6 +23,8 @@ import ru.skypro.homework.dto.*;
 @RequestMapping("/ads")
 @Tag(name = "Комментарии")
 public class CommentController {
+    private final CommentService commentService;
+
     @GetMapping("/{id}/comments")
     @Operation(summary = "Получение комментариев объявления")
     @ApiResponses(value = {
@@ -32,7 +37,8 @@ public class CommentController {
 
     })
     public ResponseEntity<Comments> getCommentsByAds(@PathVariable("id") Integer id) {
-        return ResponseEntity.ok(new Comments());
+        Comments comments = commentService.getCommentsByAds(id);
+        return ResponseEntity.ok(comments);
     }
 
     @PostMapping("/{id}/comments")
@@ -45,8 +51,9 @@ public class CommentController {
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content())
 
     })
-    public ResponseEntity<CommentDto> addComment(@PathVariable("id") Integer id, @RequestBody CreateOrUpdateComment Text) {
-        return ResponseEntity.ok(new CommentDto());
+    public ResponseEntity<CommentDto> addComment(@PathVariable("id") Integer id, @RequestBody CreateOrUpdateComment text) {
+        CommentDto comment = commentService.addComment(id, text);
+        return ResponseEntity.ok(comment);
     }
 
     @DeleteMapping("/{adId}/comments/{commentId}")
@@ -60,6 +67,7 @@ public class CommentController {
     })
     public ResponseEntity<?> deleteComment(@PathVariable("adId") Integer adId,
                                            @PathVariable("commentId") Integer commentId) {
+        commentService.deleteComment(commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -73,9 +81,11 @@ public class CommentController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PatchMapping("/{id}/comments/{commentId}")
-    public ResponseEntity<AdDto> updateComment(@PathVariable("id") Integer id,
-                                               @PathVariable("commentId") Integer commentId) {
-        return ResponseEntity.ok(new AdDto());
+    public ResponseEntity<CommentDto> updateComment(@PathVariable("id") Integer id,
+                                                    @PathVariable("commentId") Integer commentId,
+                                                    @RequestBody CreateOrUpdateComment text) {
+        CommentDto comment = commentService.updateComment(commentId, text);
+        return ResponseEntity.ok(comment);
     }
 
 }

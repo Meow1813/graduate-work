@@ -15,7 +15,7 @@ import java.util.Collection;
 public class AdEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long pk;
+    private int pk;
     @ManyToOne
     @JoinColumn(name = "author_id")
     private UserEntity author;
@@ -24,6 +24,6 @@ public class AdEntity {
     private String title;
     @Column(columnDefinition = "text")
     private String description;
-    @OneToMany(mappedBy = "ad")
+    @OneToMany(mappedBy = "ad", cascade = CascadeType.ALL)
     private Collection<CommentEntity> comments;
 }

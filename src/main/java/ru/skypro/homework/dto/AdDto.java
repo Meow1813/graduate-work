@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class AdDto {
     @Schema(description = "id автора объявления")
-    private Integer author;
+    private Long author;
     @Schema(description = "ссылка на картинку объявления")
     private String image;
     @Schema(description = "id объявления")

@@ -25,12 +25,11 @@ import ru.skypro.homework.service.UserService;
 @RequiredArgsConstructor
 @Tag(name="Пользователи")
 public class UsersController {
-    private static Logger logger = LoggerFactory.getLogger(UsersController.class);
 
     private final UserService userService;
 
     /**
-     * endpoint 1 - updating password from existent user
+     * endpoint 1 - updating password for existent user
      * @param passwordDto
      */
     @Operation(summary = "Обновление пароля")
@@ -55,8 +54,8 @@ public class UsersController {
     })
     @GetMapping("/me")
     public ResponseEntity<UserDto> getUserInfo() {
-        UserDto userDto = userService.getUserInfo();
-        return ResponseEntity.ok(userDto);
+        var user = userService.getUserInfo();
+        return ResponseEntity.ok(user);
     }
 
     /**
@@ -70,7 +69,7 @@ public class UsersController {
     })
     @PatchMapping("/me")
     public ResponseEntity<UserDto> updateUserInfo(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.updateUserInfo(userDto));
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Обновление аватара авторизованного пользователя")
@@ -80,15 +79,15 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateUserImage(@RequestParam MultipartFile image) {
-        logger.info("Avatar Controller {}", image.getContentType());
+    public ResponseEntity<String> uploadAvatar(@RequestParam MultipartFile image) {
+        log.debug("Avatar Controller {}", image.getContentType());
         String username = "authenticatedUsername"; // Get from Authentication
         String imageString = userService.updateUserImage(username, image);
         if (imageString == null) {
-            logger.info("Unable to save avatar: {}", image.getName());
+            log.debug("Unable to save avatar: {}", image.getName());
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
-        logger.info("Avatar saved");
+        log.debug("Avatar saved");
         return ResponseEntity.ok().build();
     }
 }

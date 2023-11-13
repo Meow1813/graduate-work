@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.PasswordDto;
@@ -18,23 +19,17 @@ import ru.skypro.homework.utils.MyMapper;
 @Service
 @AllArgsConstructor
 public class UserService {
-    private static Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final MyMapper mapper;
+
+    private final UserDetailsManager userDetailsManager;
 
     /**
      * method to update user password
      * @param passwordDto
      */
     public void updatePassword(PasswordDto passwordDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // since username is email it should be unique
-        String username = authentication.getName();
-        UserEntity userEntity = userRepository.findByUsername(username);
-        Long id = userEntity.getId();
-        // here working with AuthRepository(?) should follow
-        // saving new password using JdbcUserDetailsManager(?)
-        // TODO implement the above mentioned functionality
+        userDetailsManager.changePassword(passwordDto.getCurrentPassword(), passwordDto.getNewPassword());
     }
 
     /**

@@ -7,11 +7,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
@@ -31,7 +30,6 @@ import java.io.IOException;
 public class AdsController {
 
     private final AdsService adsService;
-    private static Logger logger = LoggerFactory.getLogger(AdsController.class);
 
     @Operation(summary = "Добавление объявления")
     @ApiResponses(value = {
@@ -42,13 +40,13 @@ public class AdsController {
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addAd(@RequestPart(value = "properties") CreateOrUpdateAd createOrUpdateAd, @RequestPart(value = "image") MultipartFile image) throws IOException {
-        logger.info("Ads Controller image {}, createOrUpdateAd {}", image.getContentType(), createOrUpdateAd.getTitle());
+        log.debug("Ads Controller image {}, createOrUpdateAd {}", image.getContentType(), createOrUpdateAd.getTitle());
         AdDto addedAd = adsService.addAd(createOrUpdateAd, image);
         if (addedAd == null) {
-            logger.info("Unable to save the ad");
+            log.info("Unable to save the ad");
             return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
-        logger.info("New ad is added: {}", addedAd.getTitle());
+        log.debug("New ad is added: {}", addedAd.getTitle());
         return new ResponseEntity<AdDto>(addedAd, HttpStatus.CREATED);
     }
 
@@ -72,7 +70,7 @@ public class AdsController {
     public ResponseEntity<AdInfoDto> getAdInfo(@PathVariable("id") Integer id) {
         AdInfoDto adInfoDto = adsService.getAdInfo(id);
         if (adInfoDto == null) {
-            logger.info("Not Found. Ad id {}", id);
+            log.debug("Not Found. Ad id {}", id);
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(adInfoDto);
@@ -87,7 +85,7 @@ public class AdsController {
     public ResponseEntity<AdEntity> deleteAd(@PathVariable("id") Integer id) {
         AdEntity adEntity = adsService.deleteAd(id);
         if (adEntity == null) {
-            logger.info("Not Found. Ad id {}", id);
+            log.debug("Not Found. Ad id {}", id);
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(adEntity);
@@ -105,7 +103,7 @@ public class AdsController {
                                          @RequestBody AdUpdateDto adUpdateDto) {
         AdDto adDto = adsService.patchAd(id, adUpdateDto);
         if (adDto == null) {
-            logger.info("Not Found. Ad id {}", id);
+            log.debug("Not Found. Ad id {}", id);
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(adDto);
@@ -121,7 +119,7 @@ public class AdsController {
     })
     @GetMapping("/me")
     public ResponseEntity<Ads> getAdsMe() {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(adsService.getAdsMe());
     }
 
     @Operation(summary = "Обновление картинки объявления")
@@ -135,7 +133,7 @@ public class AdsController {
 
         AdDto adDto = adsService.updateImage(id, image);
         if (adDto == null) {
-            logger.info("Not Found. Ad id {}", id);
+            log.debug("Not Found. Ad id {}", id);
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(adDto);

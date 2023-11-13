@@ -3,16 +3,19 @@ package ru.skypro.homework.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.CommentDto;
 import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
+import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.entity.AdEntity;
 import ru.skypro.homework.entity.CommentEntity;
 import ru.skypro.homework.entity.UserEntity;
 import ru.skypro.homework.exceptions.AdNotFoundException;
 import ru.skypro.homework.exceptions.CommentNotFoundException;
+import ru.skypro.homework.exceptions.UserAccessDeniedException;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.CommentRepository;
 import ru.skypro.homework.repository.UserRepository;
@@ -56,16 +59,34 @@ public class CommentService {
     }
 
     public void deleteComment(Integer commentId) {
-        commentRepository.deleteById(commentId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserEntity userEntity = userRepository.findByUsername(authentication.getName());
+        Optional<CommentEntity> opComment = commentRepository.findById(commentId);
+        if(opComment.isEmpty()){
+            throw new CommentNotFoundException();
+        }
+        CommentEntity comment = opComment.get();
+        if(comment.getAuthor().getId() == userEntity.getId() || userEntity.getRole() == Role.ROLE_ADMIN) {
+            commentRepository.deleteById(commentId);
+        }else {
+            throw new UserAccessDeniedException();
+        }
     }
 
     public CommentDto updateComment(Integer commentId, CreateOrUpdateComment text) {
-        Optional<CommentEntity> comment = commentRepository.findById(commentId);
-        if(comment.isEmpty()){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserEntity userEntity = userRepository.findByUsername(authentication.getName());
+        Optional<CommentEntity> opComment = commentRepository.findById(commentId);
+        if(opComment.isEmpty()){
             throw new CommentNotFoundException();
         }
-        comment.get().setText(text.getText());
-        commentRepository.save(comment.get());
-        return mapper.map(comment.get());
+        CommentEntity comment = opComment.get();
+        if(comment.getAuthor().getId() == userEntity.getId() || userEntity.getRole() == Role.ROLE_ADMIN) {
+            comment.setText(text.getText());
+            commentRepository.save(comment);
+            return mapper.map(comment);
+        }else {
+            throw new UserAccessDeniedException();
+        }
     }
 }

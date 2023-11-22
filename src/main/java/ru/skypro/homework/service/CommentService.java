@@ -3,7 +3,6 @@ package ru.skypro.homework.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.CommentDto;
@@ -66,7 +65,7 @@ public class CommentService {
             throw new CommentNotFoundException();
         }
         CommentEntity comment = opComment.get();
-        if(comment.getAuthor().getId() == userEntity.getId() || userEntity.getRole() == Role.ROLE_ADMIN) {
+        if(comment.getAuthor().getId() == userEntity.getId() || userEntity.getRole() == Role.ADMIN) {
             commentRepository.deleteById(commentId);
         }else {
             throw new UserAccessDeniedException();
@@ -81,7 +80,7 @@ public class CommentService {
             throw new CommentNotFoundException();
         }
         CommentEntity comment = opComment.get();
-        if(comment.getAuthor().getId() == userEntity.getId() || userEntity.getRole() == Role.ROLE_ADMIN) {
+        if(comment.getAuthor().getId() == userEntity.getId() || userEntity.getRole() == Role.ADMIN) {
             comment.setText(text.getText());
             commentRepository.save(comment);
             return mapper.map(comment);

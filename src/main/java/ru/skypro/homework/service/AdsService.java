@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +19,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -37,14 +37,14 @@ public class AdsService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserEntity userEntity = userRepository.findByUsername(authentication.getName());
-
-        Path filePath = Path.of(imageDir, UUID.randomUUID().toString() + "." + getExtension(image.getOriginalFilename()));
+        String fileName = UUID.randomUUID().toString() + "." + getExtension(image.getOriginalFilename());
+        Path filePath = Path.of(imageDir, fileName);
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
 
         Files.write(filePath,image.getBytes());
 
-        AdEntity adEntity = adRepository.save(mapper.map(createOrUpdateAd, userEntity, filePath.toString()));
+        AdEntity adEntity = adRepository.save(mapper.map(createOrUpdateAd, userEntity, fileName));
         log.debug("Ad was successfully added: {}", createOrUpdateAd.getTitle());
 
         return mapper.map(adEntity);
@@ -68,19 +68,19 @@ public class AdsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserEntity userEntity = userRepository.findByUsername(authentication.getName());
 
-        AdEntity adEntity = adRepository.getReferenceById(id);
-        if (adEntity == null) {
+        Optional<AdEntity> ad = adRepository.findById(id);
+        if (ad.isEmpty()) {
             return null;
         }
 
-
-        String path = adEntity.getImage();
-        if (path != null) {
+        AdEntity adEntity = ad.get();
+        String path = imageDir + "\\" + adEntity.getImage();
+        if (adEntity.getImage() != null) {
             File file = new File(path);
             file.delete();
         }
 
-        if (userEntity.getRole() == Role.ROLE_ADMIN || userEntity.getId() == adEntity.getAuthor().getId()) {
+        if (userEntity.getRole() == Role.ADMIN || userEntity.getId() == adEntity.getAuthor().getId()) {
             adRepository.deleteById(id);
             return adEntity;
         } else {
@@ -97,20 +97,21 @@ public class AdsService {
             return null;
         }
 
-        if (userEntity.getRole() == Role.ROLE_ADMIN || userEntity.getId() == adEntity.getAuthor().getId()) {
-            Path filePath = Path.of(imageDir, UUID.randomUUID().toString() + "." + getExtension(image.getOriginalFilename()));
+        if (userEntity.getRole() == Role.ADMIN || userEntity.getId() == adEntity.getAuthor().getId()) {
+            String fileName = UUID.randomUUID().toString() + "." + getExtension(image.getOriginalFilename());
+            Path filePath = Path.of(imageDir, fileName);
             Files.createDirectories(filePath.getParent());
             Files.deleteIfExists(filePath);
 
             Files.write(filePath,image.getBytes());
 
-            String path = adEntity.getImage();
+            String path = imageDir + "\\" + adEntity.getImage();
             if (path != null) {
                 File file = new File(path);
                 file.delete();
             }
 
-            adEntity.setImage(filePath.toString());
+            adEntity.setImage(fileName);
             adRepository.save(adEntity);
             log.debug("Image updated successfully: {}", adEntity.getImage());
 
@@ -131,7 +132,7 @@ public class AdsService {
             return null;
         }
 
-        if (userEntity.getRole() == Role.ROLE_ADMIN || userEntity.getId() == adEntity.getAuthor().getId()) {
+        if (userEntity.getRole() == Role.ADMIN || userEntity.getId() == adEntity.getAuthor().getId()) {
             adEntity.setTitle(adUpdateDto.getTitle());
             adEntity.setPrice(adUpdateDto.getPrice());
             adEntity.setDescription(adUpdateDto.getDescription());

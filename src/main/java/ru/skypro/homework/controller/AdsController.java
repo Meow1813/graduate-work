@@ -19,6 +19,9 @@ import ru.skypro.homework.service.AdsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 @Slf4j
@@ -138,4 +141,12 @@ public class AdsController {
         }
         return ResponseEntity.ok(adDto);
     }
+
+    @GetMapping(value = "/images/{id}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, "image/*"})
+    public byte[] getImage(@PathVariable("id") String id) throws IOException {
+        log.debug("Image {}", id);
+        Path path = Paths.get("images/" + id);
+        return Files.readAllBytes(path);
+    }
+
 }

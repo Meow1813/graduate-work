@@ -1,22 +1,26 @@
 package ru.skypro.homework.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.PasswordDto;
 import ru.skypro.homework.dto.UserDto;
 import ru.skypro.homework.service.UserService;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Slf4j
 @RestController
@@ -27,6 +31,7 @@ import ru.skypro.homework.service.UserService;
 public class UsersController {
 
     private final UserService userService;
+
 
     /**
      * endpoint 1 - updating password for existent user
@@ -69,7 +74,7 @@ public class UsersController {
     })
     @PatchMapping("/me")
     public ResponseEntity<UserDto> updateUserInfo(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(userService.updateUserInfo(userDto));
     }
 
     @Operation(summary = "Обновление аватара авторизованного пользователя")
@@ -79,15 +84,18 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadAvatar(@RequestParam MultipartFile image) {
-        log.debug("Avatar Controller {}", image.getContentType());
-        String username = "authenticatedUsername"; // Get from Authentication
-        String imageString = userService.updateUserImage(username, image);
-        if (imageString == null) {
-            log.debug("Unable to save avatar: {}", image.getName());
-            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
-        }
-        log.debug("Avatar saved");
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UserDto> uploadAvatar(@RequestParam MultipartFile image,
+                                               @Parameter(hidden = true) Authentication auth) throws IOException {
+        String username = auth.getName();
+        UserDto user = userService.updateUserImage(username, image);
+
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping(value = "/avatars/{id}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, "image/*"})
+    public byte[] getImage(@PathVariable("id") String id) throws IOException {
+        log.info("Here is id {}", id);
+        Path path = Path.of("avatars", id);
+        return Files.readAllBytes(path);
     }
 }

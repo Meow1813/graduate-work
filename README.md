@@ -22,7 +22,7 @@
 - [x] [Лысенко Александр](https://github.com/Meow1813)
 - [x] [Семенихин Кирилл](https://github.com/DoubleGarry)
 - [x] [Козицына Анна](https://github.com/madtrio)
-- [x] [Никулица Александр](https://github.com/alex-niculita)
+- [x] [Никулица Александр](https://github.com/alex-pnz)
 ---
 ### Начало работы:
 

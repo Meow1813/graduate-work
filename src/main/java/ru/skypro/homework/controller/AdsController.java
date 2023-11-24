@@ -144,7 +144,7 @@ public class AdsController {
 
     @GetMapping(value = "/images/{id}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, "image/*"})
     public byte[] getImage(@PathVariable("id") String id) throws IOException {
-        return adsService.getImageFromFS(id);
+        return adsService.getImage(id);
     }
 
 }

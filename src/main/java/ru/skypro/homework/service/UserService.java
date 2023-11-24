@@ -61,11 +61,12 @@ public class UserService {
     public UserDto updateUserInfo(UserDto userDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        UserEntity userEntityOld = userRepository.findByUsername(username);
-        UserEntity userEntityNew = mapper.map(userDto);
-        userEntityNew.setId(userEntityOld.getId());
-        userRepository.save(userEntityNew);
-        return mapper.map(userEntityNew);
+        UserEntity userEntity = userRepository.findByUsername(username);
+        userEntity.setFirstName(userDto.getFirstName());
+        userEntity.setLastName(userDto.getLastName());
+        userEntity.setPhone(userDto.getPhone());
+        userRepository.save(userEntity);
+        return mapper.map(userEntity);
     }
 
     /**

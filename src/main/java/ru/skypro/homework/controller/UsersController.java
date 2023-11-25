@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,8 +18,7 @@ import ru.skypro.homework.dto.UserDto;
 import ru.skypro.homework.service.UserService;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+
 
 @Slf4j
 @RestController
@@ -77,6 +75,11 @@ public class UsersController {
         return ResponseEntity.ok(userService.updateUserInfo(userDto));
     }
 
+    /**
+     * updating user avatar
+     * @param image - user picture image
+     * @return - UserDto with image url for front-end
+     * */
     @Operation(summary = "Обновление аватара авторизованного пользователя")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content = {
@@ -92,10 +95,12 @@ public class UsersController {
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * returns user avatar to front-end
+     * */
     @GetMapping(value = "/avatars/{id}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, "image/*"})
     public byte[] getImage(@PathVariable("id") String id) throws IOException {
         log.info("Here is id {}", id);
-        Path path = Path.of("avatars", id);
-        return Files.readAllBytes(path);
+        return userService.getAvatar(id);
     }
 }

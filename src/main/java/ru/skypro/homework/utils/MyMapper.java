@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class MyMapper {
     private final ModelMapper modelMapper;
+    private final String ADS_IMAGE_PATH = "/ads/images/";
 
     /*
     * Here methods returning Dto come
@@ -46,7 +47,7 @@ public class MyMapper {
     public AdDto map(AdEntity entity) {
         AdDto adDto = new AdDto();
         adDto.setAuthor(entity.getAuthor().getId());
-        adDto.setImage("/ads/images/" + entity.getImage());
+        adDto.setImage(ADS_IMAGE_PATH + entity.getImage());
         adDto.setPk(entity.getPk());
         adDto.setPrice(entity.getPrice());
         adDto.setTitle(entity.getTitle());
@@ -68,7 +69,7 @@ public class MyMapper {
         dto.setAuthorLastName(entity.getAuthor().getLastName());
         dto.setDescription(entity.getDescription());
         dto.setEmail(entity.getAuthor().getUsername());
-        dto.setImage("/ads/images/" + entity.getImage());
+        dto.setImage(ADS_IMAGE_PATH + entity.getImage());
         dto.setPhone(entity.getAuthor().getPhone());
         dto.setPrice(entity.getPrice());
         dto.setTitle(entity.getTitle());

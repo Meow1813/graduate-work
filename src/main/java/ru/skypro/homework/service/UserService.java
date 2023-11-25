@@ -36,7 +36,7 @@ public class UserService {
 
     /**
      * method to update user password
-     * @param passwordDto
+     * @param passwordDto containing old and new password
      */
     public void updatePassword(PasswordDto passwordDto) {
         userDetailsManager.changePassword(passwordDto.getCurrentPassword(), passwordDto.getNewPassword());
@@ -44,7 +44,7 @@ public class UserService {
 
     /**
      * method to get info about registered user
-     * @return
+     * @return UserDto with information
      */
     public UserDto getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -53,16 +53,28 @@ public class UserService {
         return mapper.map(userEntity);
     }
 
+    /**
+     * updates user info
+     * @param userDto with new info
+     * @return UserDto with updated info
+     * */
     public UserDto updateUserInfo(UserDto userDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        UserEntity userEntityOld = userRepository.findByUsername(username);
-        UserEntity userEntityNew = mapper.map(userDto);
-        userEntityNew.setId(userEntityOld.getId());
-        userRepository.save(userEntityNew);
-        return mapper.map(userEntityNew);
+        UserEntity userEntity = userRepository.findByUsername(username);
+        userEntity.setFirstName(userDto.getFirstName());
+        userEntity.setLastName(userDto.getLastName());
+        userEntity.setPhone(userDto.getPhone());
+        userRepository.save(userEntity);
+        return mapper.map(userEntity);
     }
 
+    /**
+     * uploads user avatar image
+     * @param username - use name(email)
+     * @param file - user image
+     * @return UserDto with url to access user image by frontend
+     * */
     public UserDto updateUserImage(String username, MultipartFile file) throws IOException {
         String fileName = username.replaceAll("[@.]", "_")
                 + file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
@@ -76,5 +88,15 @@ public class UserService {
         userRepository.save(user);
 
         return mapper.map(user);
+    }
+
+    /**
+     * sends user avatar to frontend
+     * @param id - picture id
+     * @return - byte array with picture
+     * */
+    public byte[] getAvatar(String id) throws IOException {
+        Path path = Path.of(avatarDir, id);
+        return Files.readAllBytes(path);
     }
 }

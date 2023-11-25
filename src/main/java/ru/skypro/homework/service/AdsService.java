@@ -18,6 +18,7 @@ import ru.skypro.homework.utils.MyMapper;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +34,10 @@ public class AdsService {
     @Value("${ads.image.dir.path}")
     private String imageDir;
 
+    /**
+     * method to create new ad and save it to DB
+     * @return AdDto with information
+     */
     public AdDto addAd(CreateOrUpdateAd createOrUpdateAd, MultipartFile image) throws IOException {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -50,11 +55,20 @@ public class AdsService {
         return mapper.map(adEntity);
     }
 
+    /**
+     * method to get all existing ads currently stored in DB
+     * @return Ads, a collective object that holds information about all ads
+     */
     public Ads getAllAds() {
         List<AdEntity> entities = adRepository.findAll();
         log.debug("Number of ads sent: {}", entities.size());
         return mapper.map(entities);
     }
+
+    /**
+     * method to get info about an ad by its id
+     * @return AdInfoDto with information
+     */
 
     public AdInfoDto getAdInfo(Integer id) {
         AdEntity adEntity = adRepository.getReferenceById(id);
@@ -63,6 +77,11 @@ public class AdsService {
         }
             return mapper.map(adEntity,true);
     }
+
+    /**
+     * method to delete an ad by its id number
+     * @return AdEntity
+     */
 
     public AdEntity deleteAd(Integer id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -87,6 +106,11 @@ public class AdsService {
             throw new UserAccessDeniedException();
         }
     }
+
+    /**
+     * method for updating an image for a particular ad
+     * @return AdDto with information
+     */
 
     public AdDto updateImage(Integer id, MultipartFile image) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -122,6 +146,10 @@ public class AdsService {
 
     }
 
+    /**
+     * method to update a particular ad
+     * @return AdDto with information
+     */
     public AdDto patchAd(Integer id, AdUpdateDto adUpdateDto) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -144,6 +172,10 @@ public class AdsService {
         }
     }
 
+    /**
+     * method to get all ads of a currently authorized user
+     * @return AdsDto with information
+     */
     public Ads getAdsMe() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserEntity userEntity = userRepository.findByUsername(authentication.getName());
@@ -152,6 +184,21 @@ public class AdsService {
         return mapper.map(entities);
 
     }
+
+    /**
+     * method to get an image by its id
+     * @return byte[], an actual image
+     */
+
+    public byte[] getImage(String id) throws IOException {
+        Path path = Path.of(imageDir, id);
+        return Files.readAllBytes(path);
+    }
+
+    /**
+     * utility method to get an extension of a file to be used in file id creation
+     * @return String
+     */
 
     private String getExtension(String fileName) {
         log.debug("Method getExtension is called, argument(s) passed: {}", fileName);

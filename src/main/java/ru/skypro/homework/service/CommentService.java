@@ -33,9 +33,14 @@ public class CommentService {
     private final UserRepository userRepository;
     private final AdRepository adRepository;
 
+    /**
+     * метод для получения комментариев по конкретному объявлению
+     *
+     * @return Comments
+     */
     public Comments getCommentsByAds(Integer id) {
         Optional<AdEntity> ad = adRepository.findById(id);
-        if(ad.isEmpty()){
+        if (ad.isEmpty()) {
             throw new AdNotFoundException();
         }
         List<CommentDto> comments = commentRepository.findAllByAd(ad.get()).stream()
@@ -44,12 +49,15 @@ public class CommentService {
         return new Comments(comments.size(), comments);
     }
 
+    /**
+     * метод создания нового коментария
+     */
     public CommentDto addComment(Integer id, CreateOrUpdateComment text) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         UserEntity user = userRepository.findByUsername(username);
         Optional<AdEntity> ad = adRepository.findById(id);
-        if(ad.isEmpty()){
+        if (ad.isEmpty()) {
             throw new AdNotFoundException();
         }
         CommentEntity comment = mapper.map(text, user, ad.get());
@@ -57,34 +65,40 @@ public class CommentService {
         return mapper.map(comment);
     }
 
+    /**
+     * метод для удаления комментариев
+     */
     public void deleteComment(Integer commentId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserEntity userEntity = userRepository.findByUsername(authentication.getName());
         Optional<CommentEntity> opComment = commentRepository.findById(commentId);
-        if(opComment.isEmpty()){
+        if (opComment.isEmpty()) {
             throw new CommentNotFoundException();
         }
         CommentEntity comment = opComment.get();
-        if(comment.getAuthor().getId() == userEntity.getId() || userEntity.getRole() == Role.ADMIN) {
+        if (comment.getAuthor().getId() == userEntity.getId() || userEntity.getRole() == Role.ADMIN) {
             commentRepository.deleteById(commentId);
-        }else {
+        } else {
             throw new UserAccessDeniedException();
         }
     }
 
+    /**
+     * метод для редактирования комментария
+     */
     public CommentDto updateComment(Integer commentId, CreateOrUpdateComment text) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserEntity userEntity = userRepository.findByUsername(authentication.getName());
         Optional<CommentEntity> opComment = commentRepository.findById(commentId);
-        if(opComment.isEmpty()){
+        if (opComment.isEmpty()) {
             throw new CommentNotFoundException();
         }
         CommentEntity comment = opComment.get();
-        if(comment.getAuthor().getId() == userEntity.getId() || userEntity.getRole() == Role.ADMIN) {
+        if (comment.getAuthor().getId() == userEntity.getId() || userEntity.getRole() == Role.ADMIN) {
             comment.setText(text.getText());
             commentRepository.save(comment);
             return mapper.map(comment);
-        }else {
+        } else {
             throw new UserAccessDeniedException();
         }
     }
